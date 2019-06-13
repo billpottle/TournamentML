@@ -1,0 +1,695 @@
+Public Sub CommandButton1_Click()
+
+Dim begWeight As Double
+begWeight = Range("L10").Value
+
+Dim intWeight As Double
+intWeight = Range("L11").Value
+
+Dim advWeight As Double
+advWeight = Range("L12").Value
+
+Dim blackWeight As Double
+blackWeight = Range("L13").Value
+
+Dim maleWeight As Double
+maleWeight = Range("N10").Value
+
+Dim femaleWeight As Double
+femaleWeight = Range("N11").Value
+
+Dim ageMul As Double
+ageMul = Range("P10").Value
+
+Dim weightMul As Double
+weightMul = Range("P11").Value
+
+Dim logWeight As Double
+logWeight = Range("O13").Value
+
+Worksheets("Input").Rows(1).Delete
+Dim numAthletes As Integer
+
+
+
+numAthletes = WorksheetFunction.CountA(Worksheets("Input").Range("A:A"))
+'Worksheets("Input").CountA (ActiveSheet.Range("A:A")) ' UsedRange.Rows.Count
+
+For i = 1 To numAthletes
+   'Keep Name
+    Worksheets("toTF").Cells(i, 1).Value = Worksheets("Input").Cells(i, 1).Value
+    'Weight
+    Worksheets("toTF").Cells(i, 2).Value = Application.WorksheetFunction.Log(Worksheets("Input").Cells(i, 2).Value, logWeight) * weightMul
+    'Keep School
+    Worksheets("toTF").Cells(i, 3).Value = Worksheets("Input").Cells(i, 3).Value
+    'Convert Belts
+    If (StrComp(Worksheets("Input").Cells(i, 4).Value, "Beg") = 0) Then
+    Worksheets("toTF").Cells(i, 4).Value = begWeight
+    End If
+    If (StrComp(Worksheets("Input").Cells(i, 4).Value, "Int") = 0) Then
+    Worksheets("toTF").Cells(i, 4).Value = intWeight
+    End If
+    If (StrComp(Worksheets("Input").Cells(i, 4).Value, "Adv") = 0) Then
+    Worksheets("toTF").Cells(i, 4).Value = advWeight
+    End If
+    If (StrComp(Worksheets("Input").Cells(i, 4).Value, "Black") = 0) Then
+    Worksheets("toTF").Cells(i, 4).Value = blackWeight
+    End If
+    'Age
+    Worksheets("toTF").Cells(i, 5).Value = Application.WorksheetFunction.Log(Worksheets("Input").Cells(i, 5).Value, logWeight) * ageMul
+  'Convert Gender
+    If (StrComp(Worksheets("Input").Cells(i, 6).Value, "Male") = 0) Then
+    Worksheets("toTF").Cells(i, 6).Value = maleWeight
+    End If
+    If (StrComp(Worksheets("Input").Cells(i, 6).Value, "Female") = 0) Then
+    Worksheets("toTF").Cells(i, 6).Value = femaleWeight
+    End If
+    
+    
+Next i
+MsgBox "Success! " & numAthletes & " athletes prepared. Open a new workbook, save the toTF sheet as athletes.csv and upload"
+
+
+
+End Sub
+
+
+
+Private Sub CommandButton3_Click()
+Dim begWeight As Double
+begWeight = Range("L10").Value
+
+Dim intWeight As Double
+intWeight = Range("L11").Value
+
+Dim advWeight As Double
+advWeight = Range("L12").Value
+
+Dim blackWeight As Double
+blackWeight = Range("L13").Value
+
+Dim maleWeight As Double
+maleWeight = Range("N10").Value
+
+Dim femaleWeight As Double
+femaleWeight = Range("N11").Value
+
+Dim ageMul As Double
+ageMul = Range("P10").Value
+
+Dim weightMul As Double
+weightMul = Range("P11").Value
+
+Dim logWeight As Double
+logWeight = Range("O13").Value
+
+Dim numAthletes As Integer
+numAthletes = Worksheets("fromTF").UsedRange.Rows.Count
+
+For i = 1 To numAthletes
+   'Keep Name
+    Worksheets("event").Cells(i, 1).Value = Worksheets("fromTF").Cells(i, 8).Value
+    'Weight
+    Worksheets("event").Cells(i, 2).Value = Round(Application.WorksheetFunction.Power(logWeight, Val(Worksheets("fromTF").Cells(i, 2).Value) / weightMul))
+    'Keep School
+    Worksheets("event").Cells(i, 3).Value = Worksheets("FromTF").Cells(i, 9).Value
+   
+    'Convert Belts back to human readable strings
+    If Worksheets("fromTF").Cells(i, 3).Value = begWeight Then
+    Worksheets("event").Cells(i, 4) = "Beg"
+    End If
+    If Worksheets("fromTF").Cells(i, 3).Value = intWeight Then
+    Worksheets("event").Cells(i, 4) = "Int"
+    End If
+    If Worksheets("fromTF").Cells(i, 3).Value = advWeight Then
+    Worksheets("event").Cells(i, 4) = "Adv"
+    End If
+    If Worksheets("fromTF").Cells(i, 3).Value = blackWeight Then
+    Worksheets("event").Cells(i, 4) = "Black"
+    End If
+    
+    
+     'Keep Age
+    Worksheets("event").Cells(i, 5).Value = Round(Application.WorksheetFunction.Power(logWeight, Val(Worksheets("fromTF").Cells(i, 4).Value) / ageMul))
+    
+    'Convert gender back to human readable strings
+    
+    If Worksheets("fromTF").Cells(i, 5).Value = maleWeight Then
+    Worksheets("event").Cells(i, 6) = "Male"
+    End If
+    If Worksheets("fromTF").Cells(i, 5).Value = femaleWeight Then
+    Worksheets("event").Cells(i, 6) = "Female"
+    End If
+    
+    'Copy centroids (divisions) over directly, discard ID and distance.
+    Worksheets("event").Cells(i, 7).Value = Worksheets("fromTF").Cells(i, 6).Value
+
+    
+Next i
+Worksheets("event").Cells(1, 4) = "Belt"
+Worksheets("event").Cells(1, 6) = "Gender"
+
+
+
+'Sort by Centroid (division)
+
+
+Sheets("event").Range("A1:G1000").Sort key1:=Sheets("event").Range("G1"), _
+order1:=xlAscending, Header:=xlGuess, OrderCustom:=1, MatchCase:=False, _
+ Orientation:=xlTopToBottom, DataOption1:=xlSortNormal
+    
+'Insert spaces between each new division
+For j = 2 To (numAthletes * 2)
+If (Worksheets("event").Cells(j, 7) <> Worksheets("event").Cells(j - 1, 7)) Then
+Worksheets("event").Rows(j).Insert Shift:=xlDown, _
+     CopyOrigin:=xlFormatFromLeftOrAbove 'or xlFormatFromRightOrBelow
+     j = j + 1
+          
+End If
+
+Next j
+
+'Add division ranges in as division titles
+Dim titleRow As Integer
+Dim numInDiv As Integer
+
+Dim minWeight As Double
+Dim maxWeight As Double
+Dim minAge As Double
+Dim maxAge As Double
+Dim result As String
+Dim gender As String
+Dim belt As String
+
+Worksheets("event").Rows(1).Delete
+
+For i = 1 To (numAthletes * 2)
+'Store the row value to print the division title
+If IsEmpty((Worksheets("event").Cells(i, 1))) Then
+titleRow = i
+End If
+minWeight = 0
+maxWeight = 0
+minAge = 0
+maxAge = 0
+numInDiv = 1
+'Assign division's gender and belt to the value of the first record in the division. If any is different, division is mixed.
+gender = Worksheets("event").Cells(titleRow + 1, 6).Value
+belt = Worksheets("event").Cells(titleRow + 1, 4).Value
+
+
+Do Until IsEmpty((Worksheets("event").Cells(i + numInDiv, 1)))
+If ((Worksheets("event").Cells(i + numInDiv, 2).Value < minWeight) Or (minWeight = 0)) Then
+minWeight = Worksheets("event").Cells(i + numInDiv, 2).Value
+End If
+If ((Worksheets("event").Cells(i + numInDiv, 5).Value < minAge) Or (minAge = 0)) Then
+minAge = Worksheets("event").Cells(i + numInDiv, 5).Value
+End If
+If (Worksheets("event").Cells(i + numInDiv, 2).Value > maxWeight) Then
+maxWeight = Worksheets("event").Cells(i + numInDiv, 2).Value
+End If
+If (Worksheets("event").Cells(i + numInDiv, 5).Value > maxAge) Then
+maxAge = Worksheets("event").Cells(i + numInDiv, 5).Value
+End If
+
+If (StrComp(Worksheets("event").Cells(titleRow + numInDiv, 6).Value, gender) <> 0) Then
+gender = "Mixed"
+End If
+
+If (StrComp(Worksheets("event").Cells(titleRow + numInDiv, 4).Value, belt) <> 0) Then
+belt = "Demo"
+End If
+numInDiv = numInDiv + 1
+Loop
+
+
+
+'Write the division info
+
+
+If (minAge <> 0) Then
+result = gender & " " & minAge & "-" & maxAge & " YO " & belt & " " & minWeight & "-" & maxWeight & " lbs"
+Worksheets("event").Range(Worksheets("event").Cells(titleRow, 1), Worksheets("event").Cells(titleRow, 1)).Value = result
+
+End If
+
+     i = i + numInDiv - 1
+Next i
+
+
+
+
+
+MsgBox "TF Output converted to event sheet"
+
+End Sub
+
+Private Sub CommandButton4_Click()
+'some variables
+    Dim x, y, a, b, c As Long
+    Dim sSht As Excel.Worksheet
+    Dim tSht As Excel.Worksheet
+    Dim shtName, pName, pSchool As String
+    Dim bRow, bbRow, bCount As Long
+
+
+    Set sSht = Worksheets(5)
+       
+
+    bRow = sSht.Cells.SpecialCells(xlCellTypeLastCell).Row
+    
+'read sheet iteration
+    For x = 1 To bRow
+        If Not sSht.Cells(x, 1).Value = Empty And sSht.Cells(x, 1).Value <> "" Then
+            'new bracket check
+            If sSht.Cells(x, 3).Value = "" Then
+                'new bracket code
+                a = 7 'restart the placement select iter
+                Sheets("Bracket2Template").Copy after:=Sheets(Sheets.Count) 'copy sheet and set reference
+                Set tSht = ActiveSheet
+                sSht.Activate
+                MsgBox sSht.Cells(x, 1).Value
+                tSht.Name = sSht.Name & "  " & x
+                tSht.Range("B4").Value = sSht.Name & "  " & sSht.Cells(x, 1).Value 'set division title
+            Else
+                pName = sSht.Cells(x, 1).Value
+                pSchool = sSht.Cells(x, 3).Value
+                tSht.Cells(a, 2).Value = pName
+                tSht.Cells(a, 3).Value = pSchool
+                a = a + 1
+            End If
+        End If
+    Next x
+
+    sSht.Activate
+
+
+
+End Sub
+
+
+
+Private Sub CommandButton5_Click()
+'some variables
+    Dim x, y, a, b, c As Long
+    Dim sSht As Excel.Worksheet
+    Dim tSht As Excel.Worksheet
+    Dim shtName, pName, pSchool As String
+    Dim bRow, bbRow, bCount As Long
+
+'self referential variables in case I need them
+    Set sSht = Worksheets(5)
+       
+'assume current worksheet
+    bRow = sSht.Cells.SpecialCells(xlCellTypeLastCell).Row
+    
+'read sheet iteration
+    For x = 1 To bRow
+        If Not sSht.Cells(x, 1).Value = Empty And sSht.Cells(x, 1).Value <> "" Then
+            'new bracket check
+            If sSht.Cells(x, 3).Value = "" Then
+                'new bracket code
+                bbRow = sSht.Cells(x + 1, 3).End(xlDown).Row
+                If Not sSht.Cells(x + 2, 3).Value = Empty And sSht.Cells(x + 2, 3).Value <> "" Then
+                    bCount = bbRow - x 'bCount = bottom of set - title row
+                Else
+                    bCount = 1 'bcount = 1 if the next row is blank
+                End If
+                a = 1 'restart the placement select iter
+                Sheets("BracketTemplate").Copy after:=Sheets(Sheets.Count) 'copy sheet and set reference
+                Set tSht = ActiveSheet
+                sSht.Activate
+                tSht.Name = sSht.Name & "  " & x
+                tSht.Range("D1").Value = sSht.Name & "  " & sSht.Cells(x, 1).Value 'set division title
+            Else
+                pName = sSht.Cells(x, 1).Value
+                pSchool = sSht.Cells(x, 3).Value
+                'existing bracket build
+                Select Case bCount
+                    Case 1
+                        tSht.Cells(15, 8).Value = pName
+                        tSht.Cells(16, 8).Value = pSchool
+                    Case 2
+                        Select Case a
+                            Case 1
+                                tSht.Cells(8, 6).Value = pName
+                                tSht.Cells(9, 6).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(22, 6).Value = pName
+                                tSht.Cells(23, 6).Value = pSchool
+                        End Select
+                    Case 3
+                        Select Case a
+                            Case 1
+                                tSht.Cells(4, 4).Value = pName
+                                tSht.Cells(5, 4).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(11, 4).Value = pName
+                                tSht.Cells(12, 4).Value = pSchool
+                                a = a + 1
+                            Case 3
+                                tSht.Cells(22, 6).Value = pName
+                                tSht.Cells(23, 6).Value = pSchool
+                        End Select
+                    Case 4
+                        Select Case a
+                            Case 1
+                                tSht.Cells(4, 4).Value = pName
+                                tSht.Cells(5, 4).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(11, 4).Value = pName
+                                tSht.Cells(12, 4).Value = pSchool
+                                a = a + 1
+                            Case 3
+                                tSht.Cells(18, 4).Value = pName
+                                tSht.Cells(19, 4).Value = pSchool
+                                a = a + 1
+                            Case 4
+                                tSht.Cells(25, 4).Value = pName
+                                tSht.Cells(26, 4).Value = pSchool
+                        End Select
+                    Case 5
+                        Select Case a
+                            Case 1
+                                tSht.Cells(4, 4).Value = pName
+                                tSht.Cells(5, 4).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(11, 4).Value = pName
+                                tSht.Cells(12, 4).Value = pSchool
+                                a = a + 1
+                            Case 3
+                                tSht.Cells(18, 4).Value = pName
+                                tSht.Cells(19, 4).Value = pSchool
+                                a = a + 1
+                            Case 4
+                                tSht.Cells(23, 2).Value = pName
+                                tSht.Cells(24, 2).Value = pSchool
+                                a = a + 1
+                            Case 5
+                                tSht.Cells(27, 2).Value = pName
+                                tSht.Cells(28, 2).Value = pSchool
+                        End Select
+                    Case 6
+                        Select Case a
+                            Case 1
+                                tSht.Cells(4, 4).Value = pName
+                                tSht.Cells(5, 4).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(9, 2).Value = pName
+                                tSht.Cells(10, 2).Value = pSchool
+                                a = a + 1
+                            Case 3
+                                tSht.Cells(13, 2).Value = pName
+                                tSht.Cells(14, 2).Value = pSchool
+                                a = a + 1
+                            Case 4
+                                tSht.Cells(18, 4).Value = pName
+                                tSht.Cells(19, 4).Value = pSchool
+                                a = a + 1
+                            Case 5
+                                tSht.Cells(23, 2).Value = pName
+                                tSht.Cells(24, 2).Value = pSchool
+                                a = a + 1
+                            Case 6
+                                tSht.Cells(27, 2).Value = pName
+                                tSht.Cells(28, 2).Value = pSchool
+                        End Select
+                    Case 7
+                        Select Case a
+                            Case 1
+                                tSht.Cells(2, 2).Value = pName
+                                tSht.Cells(3, 2).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(6, 2).Value = pName
+                                tSht.Cells(7, 2).Value = pSchool
+                                a = a + 1
+                            Case 3
+                                tSht.Cells(9, 2).Value = pName
+                                tSht.Cells(10, 2).Value = pSchool
+                                a = a + 1
+                            Case 4
+                                tSht.Cells(13, 2).Value = pName
+                                tSht.Cells(14, 2).Value = pSchool
+                                a = a + 1
+                            Case 5
+                                tSht.Cells(18, 4).Value = pName
+                                tSht.Cells(19, 4).Value = pSchool
+                                a = a + 1
+                            Case 6
+                                tSht.Cells(23, 2).Value = pName
+                                tSht.Cells(24, 2).Value = pSchool
+                                a = a + 1
+                            Case 7
+                                tSht.Cells(27, 2).Value = pName
+                                tSht.Cells(28, 2).Value = pSchool
+                        End Select
+                    Case 8
+                        Select Case a
+                            Case 1
+                                tSht.Cells(2, 2).Value = pName
+                                tSht.Cells(3, 2).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(6, 2).Value = pName
+                                tSht.Cells(7, 2).Value = pSchool
+                                a = a + 1
+                            Case 3
+                                tSht.Cells(9, 2).Value = pName
+                                tSht.Cells(10, 2).Value = pSchool
+                                a = a + 1
+                            Case 4
+                                tSht.Cells(13, 2).Value = pName
+                                tSht.Cells(14, 2).Value = pSchool
+                                a = a + 1
+                            Case 5
+                                tSht.Cells(16, 2).Value = pName
+                                tSht.Cells(17, 2).Value = pSchool
+                                a = a + 1
+                            Case 6
+                                tSht.Cells(20, 2).Value = pName
+                                tSht.Cells(21, 2).Value = pSchool
+                                a = a + 1
+                            Case 7
+                                tSht.Cells(23, 2).Value = pName
+                                tSht.Cells(24, 2).Value = pSchool
+                                a = a + 1
+                            Case 8
+                                tSht.Cells(27, 2).Value = pName
+                                tSht.Cells(28, 2).Value = pSchool
+                        End Select
+                End Select
+            End If
+        End If
+    Next x
+
+    sSht.Activate
+
+End Sub
+
+Private Sub CommandButton6_Click()
+'some variables
+    Dim x, y, a, b, c As Long
+    Dim sSht As Excel.Worksheet
+    Dim tSht As Excel.Worksheet
+    Dim shtName, pName, pSchool As String
+    Dim bRow, bbRow, bCount As Long
+
+'self referential variables in case I need them
+    Set sSht = Worksheets(5)
+       
+'assume current worksheet
+    bRow = sSht.Cells.SpecialCells(xlCellTypeLastCell).Row
+    
+'read sheet iteration
+    For x = 1 To bRow
+        If Not sSht.Cells(x, 1).Value = Empty And sSht.Cells(x, 1).Value <> "" Then
+            'new bracket check
+            If sSht.Cells(x, 3).Value = "" Then
+                'new bracket code
+                bbRow = sSht.Cells(x + 1, 3).End(xlDown).Row
+                If Not sSht.Cells(x + 2, 3).Value = Empty And sSht.Cells(x + 2, 3).Value <> "" Then
+                    bCount = bbRow - x 'bCount = bottom of set - title row
+                Else
+                    bCount = 1 'bcount = 1 if the next row is blank
+                End If
+                a = 1 'restart the placement select iter
+                Sheets("Doubleelim").Copy after:=Sheets(Sheets.Count) 'copy sheet and set reference
+                Set tSht = ActiveSheet
+                sSht.Activate
+                tSht.Name = sSht.Name & "  " & x
+                tSht.Range("D1").Value = sSht.Name & "  " & sSht.Cells(x, 1).Value  'set division title
+            Else
+                pName = sSht.Cells(x, 1).Value
+                pSchool = sSht.Cells(x, 3).Value
+                'existing bracket build
+                Select Case bCount
+                    Case 1
+                        tSht.Cells(15, 8).Value = pName
+                        tSht.Cells(16, 8).Value = pSchool
+                    Case 2
+                        Select Case a
+                            Case 1
+                                tSht.Cells(8, 6).Value = pName
+                                tSht.Cells(9, 6).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(22, 6).Value = pName
+                                tSht.Cells(23, 6).Value = pSchool
+                        End Select
+                    Case 3
+                        Select Case a
+                            Case 1
+                                tSht.Cells(4, 4).Value = pName
+                                tSht.Cells(5, 4).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(11, 4).Value = pName
+                                tSht.Cells(12, 4).Value = pSchool
+                                a = a + 1
+                            Case 3
+                                tSht.Cells(22, 6).Value = pName
+                                tSht.Cells(23, 6).Value = pSchool
+                        End Select
+                    Case 4
+                        Select Case a
+                            Case 1
+                                tSht.Cells(4, 4).Value = pName
+                                tSht.Cells(5, 4).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(11, 4).Value = pName
+                                tSht.Cells(12, 4).Value = pSchool
+                                a = a + 1
+                            Case 3
+                                tSht.Cells(18, 4).Value = pName
+                                tSht.Cells(19, 4).Value = pSchool
+                                a = a + 1
+                            Case 4
+                                tSht.Cells(25, 4).Value = pName
+                                tSht.Cells(26, 4).Value = pSchool
+                        End Select
+                    Case 5
+                        Select Case a
+                            Case 1
+                                tSht.Cells(4, 4).Value = pName
+                                tSht.Cells(5, 4).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(11, 4).Value = pName
+                                tSht.Cells(12, 4).Value = pSchool
+                                a = a + 1
+                            Case 3
+                                tSht.Cells(18, 4).Value = pName
+                                tSht.Cells(19, 4).Value = pSchool
+                                a = a + 1
+                            Case 4
+                                tSht.Cells(23, 2).Value = pName
+                                tSht.Cells(24, 2).Value = pSchool
+                                a = a + 1
+                            Case 5
+                                tSht.Cells(27, 2).Value = pName
+                                tSht.Cells(28, 2).Value = pSchool
+                        End Select
+                    Case 6
+                        Select Case a
+                            Case 1
+                                tSht.Cells(4, 4).Value = pName
+                                tSht.Cells(5, 4).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(9, 2).Value = pName
+                                tSht.Cells(10, 2).Value = pSchool
+                                a = a + 1
+                            Case 3
+                                tSht.Cells(13, 2).Value = pName
+                                tSht.Cells(14, 2).Value = pSchool
+                                a = a + 1
+                            Case 4
+                                tSht.Cells(18, 4).Value = pName
+                                tSht.Cells(19, 4).Value = pSchool
+                                a = a + 1
+                            Case 5
+                                tSht.Cells(23, 2).Value = pName
+                                tSht.Cells(24, 2).Value = pSchool
+                                a = a + 1
+                            Case 6
+                                tSht.Cells(27, 2).Value = pName
+                                tSht.Cells(28, 2).Value = pSchool
+                        End Select
+                    Case 7
+                        Select Case a
+                            Case 1
+                                tSht.Cells(2, 2).Value = pName
+                                tSht.Cells(3, 2).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(6, 2).Value = pName
+                                tSht.Cells(7, 2).Value = pSchool
+                                a = a + 1
+                            Case 3
+                                tSht.Cells(9, 2).Value = pName
+                                tSht.Cells(10, 2).Value = pSchool
+                                a = a + 1
+                            Case 4
+                                tSht.Cells(13, 2).Value = pName
+                                tSht.Cells(14, 2).Value = pSchool
+                                a = a + 1
+                            Case 5
+                                tSht.Cells(18, 4).Value = pName
+                                tSht.Cells(19, 4).Value = pSchool
+                                a = a + 1
+                            Case 6
+                                tSht.Cells(23, 2).Value = pName
+                                tSht.Cells(24, 2).Value = pSchool
+                                a = a + 1
+                            Case 7
+                                tSht.Cells(27, 2).Value = pName
+                                tSht.Cells(28, 2).Value = pSchool
+                        End Select
+                    Case 8
+                        Select Case a
+                            Case 1
+                                tSht.Cells(2, 2).Value = pName
+                                tSht.Cells(3, 2).Value = pSchool
+                                a = a + 1
+                            Case 2
+                                tSht.Cells(6, 2).Value = pName
+                                tSht.Cells(7, 2).Value = pSchool
+                                a = a + 1
+                            Case 3
+                                tSht.Cells(9, 2).Value = pName
+                                tSht.Cells(10, 2).Value = pSchool
+                                a = a + 1
+                            Case 4
+                                tSht.Cells(13, 2).Value = pName
+                                tSht.Cells(14, 2).Value = pSchool
+                                a = a + 1
+                            Case 5
+                                tSht.Cells(16, 2).Value = pName
+                                tSht.Cells(17, 2).Value = pSchool
+                                a = a + 1
+                            Case 6
+                                tSht.Cells(20, 2).Value = pName
+                                tSht.Cells(21, 2).Value = pSchool
+                                a = a + 1
+                            Case 7
+                                tSht.Cells(23, 2).Value = pName
+                                tSht.Cells(24, 2).Value = pSchool
+                                a = a + 1
+                            Case 8
+                                tSht.Cells(27, 2).Value = pName
+                                tSht.Cells(28, 2).Value = pSchool
+                        End Select
+                End Select
+            End If
+        End If
+    Next x
+
+    sSht.Activate
+End Sub
