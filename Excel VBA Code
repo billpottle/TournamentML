@@ -1,3 +1,4 @@
+vim: syntax=vba
 Public Sub CommandButton1_Click()
 
 Dim begWeight As Double
