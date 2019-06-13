@@ -28,3 +28,5 @@ Age and weight are first normalized on a log scale, because they become less imp
 ## Notes
 
 ..* K means nearest neighbor is NOT deterministic, so in certain cases you may have better results running the simulation a second time. 
+..* You must trust the code to allow it to run on your system. If unsure, you can run everything inside a VM and the source code is all provided if you would like to check it for yourself. 
+..* You may be required to sign in to google to run the Colab code. You may receive a dialog about 'resetting all runtimes' or playground mode. Nothing needs to be stored in state, please feel free to reset. Alternatively, download the notebook and run it on your own system. 
