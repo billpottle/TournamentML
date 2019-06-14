@@ -37,3 +37,4 @@ Age and weight are first normalized on a log scale, because they become less imp
 
 ..* The program does NOT enforce seeding, or ensure that people from the same school are on opposite sides of the bracket. 
 
+..* Special thanks to Joseph Henderson for the original excel bracket printing code. 
