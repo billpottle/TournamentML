@@ -33,4 +33,7 @@ Age and weight are first normalized on a log scale, because they become less imp
 
 ..* You may be required to sign in to google to run the Colab code. You may receive a note that says the code is not officially provided by google. Uncheck 'reset all runtimes' and click 'run anyway.'  Alternatively, download the notebook and run it on your own system. 
 
+..* You can see a video of processing a division of 164 sparring competitors in under a minute at https://www.youtube.com/watch?v=LVtXEzAmpiU
+
+..* The program does NOT enforce seeding, or ensure that people from the same school are on opposite sides of the bracket. 
 
